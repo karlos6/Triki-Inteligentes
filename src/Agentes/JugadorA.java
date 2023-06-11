@@ -5,6 +5,7 @@
  */
 package Agentes;
 
+import com.google.gson.Gson;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -89,7 +90,9 @@ public class JugadorA extends Agent{
             if (mensaje != null) {
                 try {
                     // Actualizar el tablero con la respuesta del AgenteA
-                    tablero = (String[][]) mensaje.getContentObject();
+                    String tableroJson = mensaje.getContent();
+                    Gson gson = new Gson();
+                    tablero = gson.fromJson(tableroJson, String[][].class);
                     hayGanador = evaluarGanador();
                     imprimirTablero();                    
                     
@@ -144,14 +147,14 @@ public class JugadorA extends Agent{
     
     // Enviar mensaje al jugador B
     private void enviarMensajeJugadorB(){
-        try {
+        
             mensaje = new ACLMessage(ACLMessage.INFORM);
-            mensaje.addReceiver(new AID("jugadorB", AID.ISLOCALNAME));
-            mensaje.setContentObject(tablero);        
+            mensaje.addReceiver(new AID("jugadorB", AID.ISLOCALNAME));            
+            Gson gson = new Gson();
+            String tableroJson = gson.toJson(tablero);                    
+            mensaje.setContent(tableroJson);        
             send(mensaje);
-        } catch (IOException ex) {
-            Logger.getLogger(JugadorA.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
     
     // Seleccionar una cordenada valida

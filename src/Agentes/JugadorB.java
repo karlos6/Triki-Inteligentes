@@ -5,6 +5,7 @@
  */
 package Agentes;
 
+import com.google.gson.Gson;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -76,7 +77,9 @@ public class JugadorB extends Agent{
             if (mensaje != null) {
                 try {
                     // Actualizar el tablero con la respuesta del AgenteA
-                    tablero = (String[][]) mensaje.getContentObject();
+                    String tableroJson = mensaje.getContent();
+                    Gson gson = new Gson();
+                    tablero = gson.fromJson(tableroJson, String[][].class);
                     hayGanador = evaluarGanador();
                     imprimirTablero();                    
                     
@@ -171,14 +174,13 @@ public class JugadorB extends Agent{
     
     // Enviar mensaje al jugador B.
     private void enviarMensajeJugadorA(){
-        try {
-            mensaje = new ACLMessage(ACLMessage.INFORM);
-            mensaje.addReceiver(new AID("jugadorA", AID.ISLOCALNAME));
-            mensaje.setContentObject(tablero);        
-            send(mensaje);
-        } catch (IOException ex) {
-            Logger.getLogger(JugadorA.class.getName()).log(Level.SEVERE, null, ex);
-        }
+  
+        mensaje = new ACLMessage(ACLMessage.INFORM);
+        mensaje.addReceiver(new AID("jugadorA", AID.ISLOCALNAME));
+        Gson gson = new Gson();
+        String tableroJson = gson.toJson(tablero);       
+        mensaje.setContent(tableroJson);        
+        send(mensaje);
     }
     
     // Tablero string para mostrar en pantalla.
