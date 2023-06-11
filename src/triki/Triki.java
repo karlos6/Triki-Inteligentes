@@ -6,7 +6,6 @@
 package triki;
 
 import jade.Boot;
-import java.util.Random;
 
 /**
  *
@@ -19,7 +18,7 @@ public class Triki {
      */
     public static void main(String[] args) {
         // TODO code application logic here        
-        String[] opciones2 = { "-gui", "-agents", "jugadorA:Agentes.JugadorA;jugadorB:Agentes.JugadorB"};
+        String[] opciones2 = { "-gui", "-agents", "jugadorA:Agentes.JugadorA"};
         Boot.main(opciones2);        
     }
     

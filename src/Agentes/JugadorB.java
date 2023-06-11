@@ -5,6 +5,8 @@
  */
 package Agentes;
 
+import static Agentes.JugadorA.minimax;
+import PodaAlfaBeta.PodaTriki;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -20,13 +22,11 @@ import javax.swing.JOptionPane;
  *
  * @author carlo
  */
-public class JugadorB extends Agent{
-    // Numero random 
-    Random random = new Random();
-    
+public class JugadorB extends Agent{    
     // Modo de juego
     String modeJuego = "";  
-    
+    private static final int FILAS = 3;
+    private static final int COLUMNAS = 3;
     // Tablero de juego
     String[][] tablero = new String[][]{   
         {"-","-","-"},
@@ -99,9 +99,11 @@ public class JugadorB extends Agent{
     
     //Modo de juego Aleatorio
     private void modoJuegoAleatorio(){     
-        int fila = random.nextInt(3);
-        int columna = random.nextInt(3);
-        
+        int[] mejorMovimiento = PodaTriki.minimax(tablero, 0, false);
+        int fila = mejorMovimiento[0];
+        int columna = mejorMovimiento[1]; 
+               
+        System.out.println("fila : "+fila+ " columna : "+columna);
         if(tablero[fila][columna].equals("O") ){
             modoJuegoAleatorio();           
         }else if(tablero[fila][columna].equals("X")){
@@ -117,6 +119,45 @@ public class JugadorB extends Agent{
                 Logger.getLogger(JugadorB.class.getName()).log(Level.SEVERE, null, ex);
             }
         }                
+    }
+    
+    public static int[] minimax(String[][] tablero, int profundidad, boolean esMaximizador) {
+
+        if (esMaximizador) {
+            int[] mejorMovimiento = {-1, -1, Integer.MIN_VALUE};
+            for (int fila = 0; fila < FILAS; fila++) {
+                for (int columna = 0; columna < COLUMNAS; columna++) {
+                    if (tablero[fila][columna].equals("-")) {
+                        tablero[fila][columna] = "X";
+                        int[] resultado = minimax(tablero, profundidad + 1, false);
+                        tablero[fila][columna] = "-";
+                        if (resultado[2] > mejorMovimiento[2]) {
+                            mejorMovimiento[0] = fila;
+                            mejorMovimiento[1] = columna;
+                            mejorMovimiento[2] = resultado[2];
+                        }
+                    }
+                }
+            }
+            return mejorMovimiento;
+        } else {
+            int[] mejorMovimiento = {-1, -1, Integer.MAX_VALUE};
+            for (int fila = 0; fila < FILAS; fila++) {
+                for (int columna = 0; columna < COLUMNAS; columna++) {
+                    if (tablero[fila][columna].equals("-")) {
+                        tablero[fila][columna] = "O";
+                        int[] resultado = minimax(tablero, profundidad + 1, true);
+                        tablero[fila][columna] = "-";
+                        if (resultado[2] < mejorMovimiento[2]) {
+                            mejorMovimiento[0] = fila;
+                            mejorMovimiento[1] = columna;
+                            mejorMovimiento[2] = resultado[2];
+                        }
+                    }
+                }
+            }
+            return mejorMovimiento;
+        }
     }
     
     //Modo de juego Manual
