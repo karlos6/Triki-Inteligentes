@@ -11,10 +11,6 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import java.io.IOException;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -74,8 +70,7 @@ public class JugadorB extends Agent{
             String hayGanador = "";
             if (mensaje != null) {
                 try {
-                    // Actualizar el tablero con la respuesta del AgenteA
-                    tablero = (String[][]) mensaje.getContentObject();
+                    System.out.println(mensaje.getContent());
                     hayGanador = evaluarGanador();
                     imprimirTablero();                    
                     
@@ -159,9 +154,13 @@ public class JugadorB extends Agent{
         Matcher matcher = patron.matcher(cordenadas);
         // Verificar si la cadena coincide con la expresión regular
         if (matcher.matches()) {
-            String[] CordenadaXY = cordenadas.split(",");
-            tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])] = "O";
-            enviarMensajeJugadorA();            
+            String[] CordenadaXY = cordenadas.split(",");String casilla = tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])];
+            if(casilla.equals("X") || casilla.equals("O")){
+                seleccionarCordenadaValida();
+            }else{
+                tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])] = "O";
+                enviarMensajeJugadorA();      
+            }                  
         }else{
             seleccionarCordenadaValida();
         }
@@ -169,14 +168,12 @@ public class JugadorB extends Agent{
     
     // Enviar mensaje al jugador B.
     private void enviarMensajeJugadorA(){
-        try {
-            mensaje = new ACLMessage(ACLMessage.INFORM);
-            mensaje.addReceiver(new AID("jugadorA", AID.ISLOCALNAME));
-            mensaje.setContentObject(tablero);        
-            send(mensaje);
-        } catch (IOException ex) {
-            Logger.getLogger(JugadorA.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        mensaje = new ACLMessage(ACLMessage.INFORM);
+        AID r = new AID("receptor@192.168.0.103:1099/JADE", AID.ISGUID);
+        r.addAddresses("http://192.168.0.103:7778/acc");
+        mensaje.addReceiver(r);
+        mensaje.setContent(tablero.toString());
+        send(mensaje);
     }
     
     // Tablero string para mostrar en pantalla.
@@ -286,5 +283,7 @@ public class JugadorB extends Agent{
         if(!modeJuego.equals("1") && !modeJuego.equals("2")){
             seleccionarModeJuego();
         }
-    }   
+    }
+    
+
 }

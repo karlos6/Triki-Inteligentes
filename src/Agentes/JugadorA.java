@@ -11,10 +11,6 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import java.io.IOException;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -86,8 +82,8 @@ public class JugadorA extends Agent{
             String hayGanador = "";
             if (mensaje != null) {
                 try {
-                    // Actualizar el tablero con la respuesta del AgenteA
-                    tablero = (String[][]) mensaje.getContentObject();
+                    System.out.println(mensaje.getContent());
+                   
                     hayGanador = evaluarGanador();
                     imprimirTablero();                    
                     
@@ -142,16 +138,16 @@ public class JugadorA extends Agent{
     
     // Enviar mensaje al jugador B
     private void enviarMensajeJugadorB(){
-        try {
-            mensaje = new ACLMessage(ACLMessage.INFORM);
-            
-            mensaje.addReceiver(new AID("jugadorB", AID.ISLOCALNAME));
-            mensaje.setContentObject(tablero);        
-            send(mensaje);
-        } catch (IOException ex) {
-            Logger.getLogger(JugadorA.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        mensaje = new ACLMessage(ACLMessage.INFORM);
+        AID r = new AID("receptor@192.168.0.104:1099/JADE", AID.ISGUID);
+        r.addAddresses("http://192.168.0.104:7778/acc");
+        mensaje.addReceiver(r);
+        // Establecer el arreglo de bytes como contenido del mensaje
+        mensaje.setContent(tablero.toString());
+        send(mensaje);
     }
+    
+    
     
     // Seleccionar una cordenada valida
     private void seleccionarCordenadaValida(){
@@ -164,8 +160,13 @@ public class JugadorA extends Agent{
         // Verificar si la cadena coincide con la expresión regular
         if (matcher.matches()) {
             String[] CordenadaXY = cordenadas.split(",");
-            tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])] = "X";
-            enviarMensajeJugadorB();            
+            String casilla = tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])];
+            if(casilla.equals("X") || casilla.equals("O")){
+                seleccionarCordenadaValida();
+            }else{
+                tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])] = "X";
+                enviarMensajeJugadorB();   
+            }                     
         }else{
             seleccionarCordenadaValida();
         }
@@ -282,4 +283,6 @@ public class JugadorA extends Agent{
             seleccionarModeJuego();
         }
     }   
+    
+    
 }
