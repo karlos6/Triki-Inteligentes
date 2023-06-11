@@ -165,8 +165,13 @@ public class JugadorA extends Agent{
         // Verificar si la cadena coincide con la expresión regular
         if (matcher.matches()) {
             String[] CordenadaXY = cordenadas.split(",");
-            tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])] = "X";
-            enviarMensajeJugadorB();            
+             String casilla = tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])];
+            if(casilla.equals("X") || casilla.equals("O")){
+                seleccionarCordenadaValida();
+            }else{
+                tablero[Integer.parseInt(CordenadaXY[0])][Integer.parseInt(CordenadaXY[1])] = "X";
+                enviarMensajeJugadorB();   
+            }                     
         }else{
             seleccionarCordenadaValida();
         }
