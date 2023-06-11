@@ -18,10 +18,8 @@ public class Triki {
      */
     public static void main(String[] args) {
         // TODO code application logic here        
-        String[] opciones2 = { "-gui", "-agents", "jugadorA:Agentes.JugadorA"};
-        Boot.main(opciones2);        
-    }
-    
-   
-    
+
+        String[] opciones2 = { "-gui", "-agents", "jugadorB:Agentes.JugadorB;jugadorA:Agentes.JugadorA"};
+        Boot.main(opciones2); 
+    }   
 }
