@@ -5,7 +5,9 @@
  */
 package Agentes;
 
+
 import PodaAlfaBeta.PodaTriki;
+import com.google.gson.Gson;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -70,7 +72,10 @@ public class JugadorB extends Agent{
             String hayGanador = "";
             if (mensaje != null) {
                 try {
-                    System.out.println(mensaje.getContent());
+                    // Actualizar el tablero con la respuesta del AgenteA
+                    String tableroJson = mensaje.getContent();
+                    Gson gson = new Gson();
+                    tablero = gson.fromJson(tableroJson, String[][].class);
                     hayGanador = evaluarGanador();
                     imprimirTablero();                    
                     
@@ -169,10 +174,12 @@ public class JugadorB extends Agent{
     // Enviar mensaje al jugador B.
     private void enviarMensajeJugadorA(){
         mensaje = new ACLMessage(ACLMessage.INFORM);
-        AID r = new AID("receptor@192.168.0.103:1099/JADE", AID.ISGUID);
-        r.addAddresses("http://192.168.0.103:7778/acc");
-        mensaje.addReceiver(r);
-        mensaje.setContent(tablero.toString());
+        AID r = new AID("jugadorA@192.168.43.166:1099/JADE", AID.ISGUID);
+        r.addAddresses("http://192.168.43.166:7778/acc");
+        mensaje.addReceiver(r);        
+        Gson gson = new Gson();
+        String tableroJson = gson.toJson(tablero);       
+        mensaje.setContent(tableroJson);       
         send(mensaje);
     }
     
